@@ -1,0 +1,7 @@
+six
+gensim
+textdistance[extra]
+aiohttp[speedups]=3.7.2
+aiohttp_retry==2.0
+bs4
+lxml
