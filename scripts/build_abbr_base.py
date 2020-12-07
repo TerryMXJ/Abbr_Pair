@@ -2,17 +2,21 @@
 # -*- encoding: utf-8 -*-
 
 import pymysql
-import os
 from multiprocessing import Pool
 import pickle
 
 from semantictagging.miner.abbr_miner import AbbrMiner
 
+host = '******'
+user = '******'
+password = '******'
 
+
+# fetch raw data from db
 def fetch_codes():
-    db = pymysql.connect(host="10.176.64.33",
-                         user="root",
-                         passwd="123456",
+    db = pymysql.connect(host=host,
+                         user=user,
+                         passwd=password,
                          db="code_comprehension_db",
                          port=3306,
                          charset='utf8'
@@ -44,13 +48,8 @@ def mine_process(file_path, i):
 if __name__ == "__main__":
     p = Pool(40)
     for i in range(1, 17):
-        file_path = '/home/fdse/wangchong/SemanticTagging/input/classes-batch%d.pkl' % i
-        p.apply_async(mine_process, args=(file_path, i, ))
+        file_path = '/home/fdse/wangchong/Abbr_Pair/input/classes-batch%d.pkl' % i
+        p.apply_async(mine_process, args=(file_path, i,))
     p.close()
     p.join()
     print('all subprocesses done...')
-
-
-
-
-
