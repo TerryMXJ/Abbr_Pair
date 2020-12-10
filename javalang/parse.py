@@ -1,6 +1,6 @@
-
 from .parser import Parser
 from .tokenizer import tokenize
+
 
 def parse_expression(exp):
     if not exp.endswith(';'):
@@ -11,6 +11,7 @@ def parse_expression(exp):
 
     return parser.parse_expression()
 
+
 def parse_member_signature(sig):
     if not sig.endswith(';'):
         sig = sig + ';'
@@ -19,6 +20,7 @@ def parse_member_signature(sig):
     parser = Parser(tokens)
 
     return parser.parse_member_declaration()
+
 
 def parse_constructor_signature(sig):
     # Add an empty body to the signature, replacing a ; if necessary
@@ -31,11 +33,13 @@ def parse_constructor_signature(sig):
 
     return parser.parse_member_declaration()
 
+
 def parse_type(s):
     tokens = tokenize(s)
     parser = Parser(tokens)
 
     return parser.parse_type()
+
 
 def parse_type_signature(sig):
     if sig.endswith(';'):
@@ -46,6 +50,7 @@ def parse_type_signature(sig):
     parser = Parser(tokens)
 
     return parser.parse_class_or_interface_declaration()
+
 
 def parse(s):
     tokens = tokenize(s)
