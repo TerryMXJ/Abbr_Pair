@@ -37,18 +37,20 @@ def mine_process(file_path, i):
     abbr_miner = AbbrMiner()
     with open(file_path, 'rb') as f:
         data = pickle.load(f)
+    codes = list(j[-1] for j in data)
     print('open file %s successfully...' % file_path)
     # match abbr pair
-    abbr_base = abbr_miner.mine(data, i)
+    abbr_base = abbr_miner.mine(codes, i)
     # write result
     save_path = "output/abbr_pair/abbr_pair_%d.pickle" % i
     abbr_base.save_to_file(save_path)
 
 
 if __name__ == "__main__":
-    p = Pool(40)
+    # multiprocessing
+    p = Pool(20)
     for i in range(1, 17):
-        file_path = '/home/fdse/wangchong/Abbr_Pair/input/classes-batch%d.pkl' % i
+        file_path = '/home/fdse/Terry_Meng/Abbr_Pair/codebase/classes-batch%d.pkl' % i
         p.apply_async(mine_process, args=(file_path, i,))
     p.close()
     p.join()

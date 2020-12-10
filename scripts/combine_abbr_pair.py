@@ -4,7 +4,7 @@ from semantictagging.miner.abbr_base import AbbrBase
 
 if __name__ == '__main__':
     abbr_base = AbbrBase()
-    result_path = 'output/abbr_pair_result_12_03.pickle'
+    result_path = 'output/abbr_pair_result_12_10.pickle'
     for i in range(1, 17):
         print('start process file: %s' % i)
         file_path = 'output/abbr_pair/abbr_pair_%d.pickle' % i

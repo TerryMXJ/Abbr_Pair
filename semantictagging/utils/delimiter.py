@@ -4,7 +4,27 @@
 import functools
 import re
 
+
 class Delimiter:
+
+    @staticmethod
+    @functools.lru_cache(maxsize=10000)
+    def split_camel_strict(camel_case: str, to_lower=True):
+        delimited_case = camel_case.replace('...', '-DOTDOTDOT-')
+        delimited_case = delimited_case.split('.')[-1]
+        delimited_case = delimited_case.replace('[]', ' []')
+        delimited_case = delimited_case.replace('-DOTDOTDOT-', ' ...')
+        delimited_case = re.sub(r'_', " ", delimited_case).strip()
+        delimited_case = re.sub(
+            r'([A-Za-z]| )([0-9]+)([A-Za-z]|$| )', r'\1 \2 \3', delimited_case)
+        delimited_case = re.sub(r'([A-Z]+)([A-Z][a-z])', r'\1 \2', delimited_case)
+        delimited_case = re.sub(r'([A-Z]+)', r' \1', delimited_case)
+        delimited_case = re.sub(r'\s+', ' ', delimited_case)
+        delimited_case = delimited_case.strip()
+
+        if to_lower:
+            delimited_case = delimited_case.lower()
+        return delimited_case
 
     @staticmethod
     @functools.lru_cache(maxsize=10000)
@@ -19,7 +39,7 @@ class Delimiter:
         delimited_case = re.sub(
             r'([A-Za-z])([0-9]+D)([A-Z]|$)', r'\1 \2 \3', delimited_case)
         delimited_case = re.sub(r'([A-Z][0-9]?)(to)([A-Z]|$)',
-                           r'\1 \2 \3', delimited_case)
+                                r'\1 \2 \3', delimited_case)
         delimited_case = re.sub(r'([A-Z]+)([A-Z][a-z])', r'\1 \2', delimited_case)
         delimited_case = re.sub(r'([A-Z]+)', r' \1', delimited_case)
         delimited_case = re.sub(

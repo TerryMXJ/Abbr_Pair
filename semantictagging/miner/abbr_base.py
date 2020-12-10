@@ -2,6 +2,7 @@
 # -*- encoding: utf-8 -*-
 import pickle
 import json
+import os
 
 
 class AbbrBase:
@@ -26,6 +27,8 @@ class AbbrBase:
 
     def save_to_file(self, file_path):
         print('start save data to file: %s' % file_path)
+        if not os.path.exists(file_path):
+            os.system(r"touch {}".format(file_path))
         with open(file_path, 'wb') as f:
             pickle.dump(self.base, f)
         print('successfully save data to file: %s' % file_path)

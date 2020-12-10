@@ -13,6 +13,7 @@ from .abbr_base import AbbrBase
 
 from javalang.parse import parse
 from javalang.tree import VariableDeclaration, FieldDeclaration, MethodInvocation
+from javalang.parser import JavaSyntaxError
 
 # from nltk.corpus import words
 
@@ -30,20 +31,26 @@ class AbbrMiner:
         # select tokenize method
         identifiers = self.tokenize_code_based_on_ast(code)
         pairs = set()
+        collocation = set()
+        result = list()
         for term1, term2 in itertools.combinations(identifiers, 2):
             long_term, short_term = (term1, term2) if len(term1) >= len(term2) else (term2, term1)
-            # filter the short_term which is a word
-            # if self.pair_checker.check_abbr(short_term, long_term) and short_term in self.english_vocab:
-            if self.pair_checker.check_abbr(short_term, long_term):
+            if self.pair_checker.check_abbr(short_term, long_term) \
+                    and not self.pair_checker.check_collocation(short_term, long_term):
                 pairs.add((short_term, long_term))
+                # if self.pair_checker.check_collocation(short_term, long_term):
+                #     collocation.add((short_term, long_term))
+                # else:
+                #     pairs.add((short_term, long_term))
         return pairs
 
     def mine(self, codes, i) -> AbbrBase:
         abbr_base = AbbrBase()
         count = 0
         for code in codes:
-            print('[%d]start process code %d...' % (i, count))
             count += 1
+            if count % 500 is 0:
+                print('[%d]finished %d codes...' % (i, count))
             try:
                 pairs = self.process_code(code)
                 for pair in pairs:
@@ -58,7 +65,7 @@ class AbbrMiner:
         tokens = CodeCleaner.clean_annotation(list(tokens))
         for token in tokens:
             if isinstance(token, Identifier):
-                for split_value in Delimiter.split_camel(token.value).split():
+                for split_value in Delimiter.split_camel_strict(token.value).split():
                     identifiers.add(split_value)
         return identifiers
 
@@ -70,6 +77,6 @@ class AbbrMiner:
             if isinstance(node, node_types):
                 for token in node.tokens():
                     if isinstance(token, Identifier):
-                        for split_value in Delimiter.split_camel(token.value).split():
+                        for split_value in Delimiter.split_camel_strict(token.value).split():
                             identifiers.add(split_value)
         return identifiers

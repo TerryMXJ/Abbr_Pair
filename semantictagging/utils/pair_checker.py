@@ -6,6 +6,7 @@ import textdistance
 import itertools
 import functools
 import numpy as np
+from nltk.corpus import words
 
 from .nlp import NLP
 
@@ -16,6 +17,7 @@ class PairChecker:
     def __init__(self):
         self.DLDis = textdistance.DamerauLevenshtein()
         self.nlp = NLP.get_inst()
+        self.english_vocab = set(w.lower() for w in words.words())
 
     @functools.lru_cache(maxsize=10000)
     def normalize(self, term):
@@ -23,6 +25,16 @@ class PairChecker:
         name = lemma.replace("-", " ")
         name = re.sub(r"\s+", " ", name)
         return name
+
+    # 匹配对： 1. 缩写是单词 2. 全称去掉缩写后是一个单词
+    @functools.lru_cache(maxsize=10000)
+    def check_collocation(self, short_term, long_term):
+        if short_term in self.english_vocab \
+                and long_term.startswith(short_term):
+            if long_term[len(short_term):] in self.english_vocab:
+                # print('find collocation: [{} - {}]'.format(short_term, long_term))
+                return True
+        return False
 
     def check_synonym(self, long_term, short_term, max_dis=2, threshold=0.25):
         if long_term.isupper() and short_term.isupper():
