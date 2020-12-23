@@ -13,7 +13,6 @@ from .abbr_base import AbbrBase
 
 from javalang.parse import parse
 from javalang.tree import VariableDeclaration, FieldDeclaration, MethodInvocation
-from javalang.parser import JavaSyntaxError
 
 # from nltk.corpus import words
 
@@ -28,20 +27,15 @@ class AbbrMiner:
         # self.english_vocab = set(w.lower() for w in words.words())
 
     def process_code(self, code):
-        # select tokenize method
         identifiers = self.tokenize_code_based_on_ast(code)
+        print('*' * 10 + 'split identifiers info' + '*' * 10)
+        print(identifiers)
         pairs = set()
-        collocation = set()
-        result = list()
         for term1, term2 in itertools.combinations(identifiers, 2):
             long_term, short_term = (term1, term2) if len(term1) >= len(term2) else (term2, term1)
             if self.pair_checker.check_abbr(short_term, long_term) \
                     and not self.pair_checker.check_collocation(short_term, long_term):
                 pairs.add((short_term, long_term))
-                # if self.pair_checker.check_collocation(short_term, long_term):
-                #     collocation.add((short_term, long_term))
-                # else:
-                #     pairs.add((short_term, long_term))
         return pairs
 
     def mine(self, codes, i) -> AbbrBase:
@@ -71,12 +65,16 @@ class AbbrMiner:
 
     def tokenize_code_based_on_ast(self, code) -> set:
         identifiers = set()
+        tokens = set()
         node_types = (VariableDeclaration, FieldDeclaration, MethodInvocation)
         cu = parse(code)
         for path, node in cu:
             if isinstance(node, node_types):
                 for token in node.tokens():
                     if isinstance(token, Identifier):
+                        tokens.add(token.value)
                         for split_value in Delimiter.split_camel_strict(token.value).split():
                             identifiers.add(split_value)
+        print('*'*10 + 'identifiers info' + '*'*10)
+        print(tokens)
         return identifiers
