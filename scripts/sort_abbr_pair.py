@@ -10,4 +10,6 @@ if __name__ == '__main__':
     sorted_result: list = sorted(result, key=lambda x: x[1], reverse=True)
     with open(save_path, 'w+') as f:
         for i in sorted_result:
-            f.write('{} - {}\n'.format(i[0], i[1]))
+            # 过滤abbr和full都是数字的pair
+            if not i[0][0].isnumeric() and not i[0][1].isnumeric():
+                f.write('{} - {}\n'.format(i[0], i[1]))
